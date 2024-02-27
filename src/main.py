@@ -40,7 +40,7 @@ if ret:
         brow_right = np.array(points[26])
         nose_bridge = np.array(points[27])
         # Estimate the distance between the eyebrows and the top of the nose bridge
-        forehead_height = np.linalg.norm(nose_bridge - np.mean([brow_left, brow_right], axis=0)) * 3
+        forehead_height = np.linalg.norm(nose_bridge - np.mean([brow_left, brow_right], axis=0)) * 4
         # Estimate forehead points by moving up `forehead_height` from the eyebrow points
         for x, y in [points[17], points[18], points[24], points[25], points[26]]:
             estimated_forehead_point = (x, int(y - forehead_height))

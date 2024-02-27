@@ -1,34 +1,36 @@
 import numpy as np
 
+def calculate_distance(point1, point2):
+    return np.linalg.norm(np.array(point1) - np.array(point2))
+
 def calculate_face_shape(points):
-    # Estimate the width of the forehead
-    forehead_width = np.linalg.norm(np.array(points[16]) - np.array(points[0]))
+    # Measure the widths and lengths
+    forehead_width = calculate_distance(points[0], points[16])
+    cheekbone_width = calculate_distance(points[36], points[45])
+    jawline_width = calculate_distance(points[4], points[12])
+    face_length = calculate_distance(points[8], points[27])
 
-    # Estimate the width of the cheekbones
-    cheekbone_width = np.linalg.norm(np.array(points[13]) - np.array(points[3]))
+    # Define face shape based on the calculated ratios
+    shape = "Undefined"
 
-    # Estimate the jaw width (bit more complex as we need to consider multiple points)
-    jaw_width = np.linalg.norm(np.array(points[11]) - np.array(points[5]))
+    # Calculate proportions
+    face_ratio = face_length / max(forehead_width, cheekbone_width, jawline_width)
+    jaw_forehead_ratio = jawline_width / forehead_width
 
-    # Estimate the face length
-    face_length = np.linalg.norm(np.array(points[8]) - np.mean([np.array(points[0]), np.array(points[16])], axis=0))
+    # Determine face shape
+    if face_ratio <= 1.2:
+        if jaw_forehead_ratio <= 0.85:
+            shape = "Heart"
+        elif jaw_forehead_ratio > 0.85 and jaw_forehead_ratio <= 1.15:
+            shape = "Round"
+        else:
+            shape = "Square"
+    else:  # face is longer than it is wide
+        if jaw_forehead_ratio <= 0.85:
+            shape = "Oval"
+        elif jaw_forehead_ratio > 0.85 and jaw_forehead_ratio <= 1.15:
+            shape = "Oblong"
+        else:
+            shape = "Rectangle"
 
-    # Define the ratios
-    fw_ratio = forehead_width / cheekbone_width
-    fj_ratio = forehead_width / jaw_width
-    cj_ratio = cheekbone_width / jaw_width
-    fl_ratio = face_length / cheekbone_width
-
-    # Classify based on the ratios
-    if fw_ratio >= 0.8 and fj_ratio >= 0.8 and fl_ratio < 1.3:
-        return "Square"
-    elif fl_ratio >= 1.3:
-        return "Rectangle/Oblong"
-    elif cj_ratio >= 1.1:
-        return "Round"
-    elif fw_ratio > 1.0 and fj_ratio > 1.0 and fl_ratio < 1.3:
-        return "Heart"
-    elif fl_ratio >= 1.3 and fw_ratio < 1.0:
-        return "Diamond"
-    else:
-        return "Oval"
+    return shape
